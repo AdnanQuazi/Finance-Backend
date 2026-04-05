@@ -5,9 +5,13 @@ export const validate = (schema) => (req, res, next) => {
       query: req.query,
       params: req.params,
     });
-    req.body = body;
+    req.validated = {
+      body,
+      query,
+      params,
+    };
     next();
   } catch (error) {
-    next(error); 
+    next(error);
   }
 };
