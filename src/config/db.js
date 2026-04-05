@@ -1,21 +1,9 @@
-import { drizzle } from 'drizzle-orm/node-postgres';
-import pkg from 'pg';
+import { neon } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-http';
 import * as schema from '../db/schema.js';
 import 'dotenv/config';
 
-const { Pool } = pkg;
+console.log(`[DB] Connecting to database at ${process.env.DATABASE_URL}`);
+const sql = neon(process.env.DATABASE_URL);
 
-const pool = new Pool({ 
-  connectionString: process.env.DATABASE_URL,
-  max: 30, 
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
-});
-
-// Critical: Handle unexpected errors on idle clients
-pool.on('error', (err) => {
-  console.error('Unexpected error on idle database client', err);
-  process.exit(-1);
-});
-
-export const db = drizzle(pool, { schema });
+export const db = drizzle(sql, { schema });
