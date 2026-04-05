@@ -18,10 +18,8 @@ describe('Auth Integration Tests', () => {
   let token = '';
 
   beforeAll(async () => {
-    // 1. Clean up user if already exists from a previous bad run
     await db.delete(users).where(eq(users.email, testUser.email));
 
-    // 2. Seed the test user into the database
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(testUser.password, salt);
 
@@ -35,10 +33,8 @@ describe('Auth Integration Tests', () => {
   });
 
   afterAll(async () => {
-    // 1. Clean up seeded data to leave test DB pristine
     await db.delete(users).where(eq(users.email, testUser.email));
     
-    // (Note: Removed 'await pool.end()' since neon-http serverless driver disables persistent TCP pools)
   });
 
   describe('POST /auth/login', () => {
@@ -55,9 +51,8 @@ describe('Auth Integration Tests', () => {
       expect(res.body.data).toHaveProperty('token');
       expect(res.body.data.user).toBeDefined();
       expect(res.body.data.user.email).toBe(testUser.email);
-      expect(res.body.data.user.password).toBeUndefined(); // Should not leak password hash
+      expect(res.body.data.user.password).toBeUndefined();
       
-      // Save for subsequent GET /auth/me tests
       token = res.body.data.token;
     });
 
@@ -80,7 +75,6 @@ describe('Auth Integration Tests', () => {
         .post('/auth/login')
         .send({
           email: testUser.email,
-          // Missing password
         });
 
       expect(res.status).toBe(400); 
