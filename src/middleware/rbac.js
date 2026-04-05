@@ -10,7 +10,6 @@ export const authorize = (allowedRoles) => {
 
     const userLevel = roleHierarchy[req.user.role] || 0;
 
-    // Check if user matches at least one of the allowed roles' levels
     const hasAccess = allowedRoles.some(allowedRole => userLevel >= roleHierarchy[allowedRole]);
 
     if (!hasAccess) {

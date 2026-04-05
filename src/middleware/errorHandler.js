@@ -2,8 +2,6 @@ import { ZodError } from 'zod';
 import { errorResponse } from '../utils/apiResponse.js';
 
 export const errorHandler = (err, req, res, next) => {
-  console.error(`[Error] ${err.message}`, err);
-
   if (err instanceof ZodError) {
     return res.status(400).json({
       success: false,

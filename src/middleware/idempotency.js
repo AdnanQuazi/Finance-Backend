@@ -26,15 +26,12 @@ export const idempotencyCheck = async (req, res, next) => {
       return res.status(record.responseCode).json(record.responseBody);
     }
 
-    // Attach original send function to intercept response
     const originalSend = res.json.bind(res);
     res.json = function (body) {
-      // Don't intercept more than once per request
       if (!res.locals.intercepted) {
         res.locals.intercepted = true;
         res.locals.responseBody = body;
 
-        // Save idempotency record non-blocking, assuming successful processing
         if (res.statusCode >= 200 && res.statusCode < 300) {
           db.insert(idempotencyKeys).values({
             key,
