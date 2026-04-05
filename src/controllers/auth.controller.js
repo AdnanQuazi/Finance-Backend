@@ -2,7 +2,7 @@ import * as authService from '../services/auth.service.js';
 import { successResponse } from '../utils/apiResponse.js';
 
 export const login = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password } = req.validated.body;
   const result = await authService.login(email, password);
   return successResponse(res, 'Login successful', result);
 };

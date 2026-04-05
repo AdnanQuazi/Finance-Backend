@@ -8,7 +8,7 @@ export const getUsers = asyncHandler(async (req, res) => {
 });
 
 export const createUser = asyncHandler(async (req, res) => {
-  const newUser = await userService.createUser(req.body);
+  const newUser = await userService.createUser(req.validated.body);
   return res.status(201).json({
     success: true,
     message: 'User created successfully',
@@ -17,16 +17,16 @@ export const createUser = asyncHandler(async (req, res) => {
 });
 
 export const updateRole = asyncHandler(async (req, res) => {
-  const updatedUser = await userService.updateUserRole(req.params.id, req.body.role);
+  const updatedUser = await userService.updateUserRole(req.validated.params.id, req.validated.body.role);
   return successResponse(res, 'User role updated successfully', updatedUser);
 });
 
 export const updateStatus = asyncHandler(async (req, res) => {
-  const updatedUser = await userService.updateUserStatus(req.params.id, req.body.status);
+  const updatedUser = await userService.updateUserStatus(req.validated.params.id, req.validated.body.status);
   return successResponse(res, 'User status updated successfully', updatedUser);
 });
 
 export const deleteUser = asyncHandler(async (req, res) => {
-  await userService.deleteUser(req.params.id);
+  await userService.deleteUser(req.validated.params.id);
   return successResponse(res, 'User deleted successfully');
 });
