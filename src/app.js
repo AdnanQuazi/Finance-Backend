@@ -2,6 +2,7 @@ import express from 'express';
 import { apiRateLimiter } from './middleware/rateLimiter.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import authRoutes from './routes/auth.routes.js';
+import userRoutes from './routes/user.routes.js';
 import { AppError } from './utils/AppError.js';
 
 const app = express();
@@ -12,6 +13,7 @@ app.use(express.json());
 app.use(apiRateLimiter);
 
 app.use('/auth', authRoutes);
+app.use('/users', userRoutes);
 
 // Fallback 404 Route
 app.use((req, res, next) => {
