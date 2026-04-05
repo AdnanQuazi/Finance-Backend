@@ -9,8 +9,8 @@ export const errorHandler = (err, req, res, next) => {
       success: false,
       error: {
         code: 'VALIDATION_ERROR',
-        message: err.errors[0].message,
-        details: err.errors.map(e => ({ path: e.path, message: e.message }))
+        message: err.issues[0].message,
+        details: err.issues.map(e => ({ path: e.path, message: e.message }))
       }
     });
   }

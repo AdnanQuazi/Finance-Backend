@@ -5,12 +5,7 @@ export const validate = (schema) => (req, res, next) => {
       query: req.query,
       params: req.params,
     });
-
-    // Overwrite with cleaned/parsed data
     req.body = body;
-    req.query = query;
-    req.params = params;
-
     next();
   } catch (error) {
     next(error); 
