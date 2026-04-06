@@ -1,4 +1,5 @@
 import express from 'express';
+import swaggerUi from 'swagger-ui-express';
 import { apiRateLimiter } from './middleware/rateLimiter.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import authRoutes from './routes/auth.routes.js';
@@ -6,6 +7,7 @@ import userRoutes from './routes/user.routes.js';
 import recordRoutes from './routes/record.routes.js';
 import dashboardRoutes from './routes/dashboard.routes.js';
 import { AppError } from './utils/AppError.js';
+import { swaggerSpec } from './docs/swagger.js';
 
 const app = express();
 
@@ -18,6 +20,8 @@ app.use('/auth', authRoutes);
 app.use('/users', userRoutes);
 app.use('/records', recordRoutes);
 app.use('/dashboard', dashboardRoutes);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, { explorer: true }));
+app.get('/api-docs.json', (req, res) => res.status(200).json(swaggerSpec));
 
 // Fallback 404 Route
 app.use((req, res, next) => {
