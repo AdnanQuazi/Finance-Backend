@@ -79,6 +79,13 @@ Seed the base 4 roles (`admin`, `manager`, `analyst`, `viewer` arrays) for insta
 node scripts/seed.js
 ```
 
+Seeded test accounts use the same password for quick login during local testing:
+
+- `admin@finance.com` - `Password123!` - System Admin
+- `manager@finance.com` - `Password123!` - Finance Manager
+- `analyst@finance.com` - `Password123!` - Data Analyst
+- `viewer@finance.com` - `Password123!` - Guest Viewer
+
 ### 6. Start the Server
 Spin up the local environment:
 ```bash
@@ -97,6 +104,8 @@ Ensure your server is live and navigate to the integrated portal to experiment w
 ## 🧪 Testing (Integration tests)
 
 The project leverages `vitest` mapped against route-integrated assertions to guarantee HTTP and middleware chains operate as anticipated across the entire database architecture.
+
+Use one of the seeded accounts above when generating a JWT from `POST /auth/login` for integration tests.
 
 To run the integration suite locally:
 ```bash
