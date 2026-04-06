@@ -4,6 +4,7 @@ import { errorHandler } from './middleware/errorHandler.js';
 import authRoutes from './routes/auth.routes.js';
 import userRoutes from './routes/user.routes.js';
 import recordRoutes from './routes/record.routes.js';
+import dashboardRoutes from './routes/dashboard.routes.js';
 import { AppError } from './utils/AppError.js';
 
 const app = express();
@@ -16,6 +17,7 @@ app.use(apiRateLimiter);
 app.use('/auth', authRoutes);
 app.use('/users', userRoutes);
 app.use('/records', recordRoutes);
+app.use('/dashboard', dashboardRoutes);
 
 // Fallback 404 Route
 app.use((req, res, next) => {
