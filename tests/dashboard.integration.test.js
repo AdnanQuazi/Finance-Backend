@@ -53,7 +53,6 @@ describe("Dashboard Integration Tests (Complete & Pollution-Free)", () => {
     }
   });
 
-  // ── SUMMARY (Aggregation & Soft Delete) ──
   describe("GET /dashboard/summary", () => {
     it("Calculates net balance correctly and strictly ignores soft-deleted records", async () => {
       const [deleted] = await db.insert(financialRecords).values(makeRecord({ amount: "999.00", createdBy: userIds.admin })).returning();
@@ -78,7 +77,6 @@ describe("Dashboard Integration Tests (Complete & Pollution-Free)", () => {
     });
   });
 
-  // ── ACTIVITY (Pagination & Ordering) ──
   describe("GET /dashboard/activity", () => {
     it("Returns max 10 records ordered by date descending", async () => {
       const batch = Array.from({ length: 12 }, (_, i) =>
@@ -94,7 +92,6 @@ describe("Dashboard Integration Tests (Complete & Pollution-Free)", () => {
     });
   });
 
-  // ── CATEGORIES (RBAC & Grouping) ──
   describe("GET /dashboard/categories", () => {
     it("Blocks Viewer role from accessing categories (403)", async () => {
       const res = await request(app).get("/dashboard/categories").set("Authorization", `Bearer ${tokens.viewer}`);
@@ -116,7 +113,6 @@ describe("Dashboard Integration Tests (Complete & Pollution-Free)", () => {
     });
   });
 
-  // ── TRENDS (Filtering & Idempotency) ──
   describe("GET /dashboard/trends", () => {
     it("Filters by date range correctly", async () => {
       await db.insert(financialRecords).values([
@@ -147,7 +143,6 @@ describe("Dashboard Integration Tests (Complete & Pollution-Free)", () => {
     });
   });
 
-  // ── CROSS-ENDPOINT CONSISTENCY ──
   describe("Cross-Endpoint Consistency", () => {
     it("Summary totals perfectly match the aggregated Category totals", async () => {
       await db.insert(financialRecords).values([

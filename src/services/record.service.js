@@ -60,57 +60,60 @@ export const getRecordById = async (id) => {
 };
 
 export const createRecord = async (data, userId) => {
-  const [record] = await db.insert(financialRecords)
-    .values({ ...data, amount: String(data.amount), createdBy: userId, updatedAt: new Date() })
-    .returning();
+  return await db.transaction(async (tx) => {
+    const [record] = await tx.insert(financialRecords)
+      .values({ ...data, amount: String(data.amount), createdBy: userId, updatedAt: new Date() })
+      .returning();
 
-  await db.insert(auditLogs)
-    .values({ recordId: record.id, changedBy: userId, action: 'INSERT', oldValues: null, newValues: record })
-    .catch((err) => console.error('Audit log failed:', err));
+    await tx.insert(auditLogs)
+      .values({ recordId: record.id, changedBy: userId, action: 'INSERT', oldValues: null, newValues: record });
 
-  return record;
+    return record;
+  });
 };
 
 export const updateRecord = async (id, data, userId) => {
-  const [oldRecord] = await db.select()
-    .from(financialRecords)
-    .where(and(eq(financialRecords.id, id), isNull(financialRecords.deletedAt)));
+  return await db.transaction(async (tx) => {
+    const [oldRecord] = await tx.select()
+      .from(financialRecords)
+      .where(and(eq(financialRecords.id, id), isNull(financialRecords.deletedAt)));
 
-  if (!oldRecord) throw new AppError('Record not found', 404, 'NOT_FOUND');
+    if (!oldRecord) throw new AppError('Record not found', 404, 'NOT_FOUND');
 
-  const [updatedRecord] = await db.update(financialRecords)
-    .set({
-      ...data,
-      ...(data.amount !== undefined && { amount: String(data.amount) }),
-      updatedBy: userId,
-      updatedAt: new Date(),
-    })
-    .where(eq(financialRecords.id, id))
-    .returning();
+    const [updatedRecord] = await tx.update(financialRecords)
+      .set({
+        ...data,
+        ...(data.amount !== undefined && { amount: String(data.amount) }),
+        updatedBy: userId,
+        updatedAt: new Date(),
+      })
+      .where(eq(financialRecords.id, id))
+      .returning();
 
-  await db.insert(auditLogs)
-    .values({ recordId: id, changedBy: userId, action: 'UPDATE', oldValues: oldRecord, newValues: updatedRecord })
-    .catch((err) => console.error('Audit log failed:', err));
+    await tx.insert(auditLogs)
+      .values({ recordId: id, changedBy: userId, action: 'UPDATE', oldValues: oldRecord, newValues: updatedRecord });
 
-  return updatedRecord;
+    return updatedRecord;
+  });
 };
 
 export const softDeleteRecord = async (id, userId) => {
-  const [oldRecord] = await db.select()
-    .from(financialRecords)
-    .where(and(eq(financialRecords.id, id), isNull(financialRecords.deletedAt)));
+  return await db.transaction(async (tx) => {
+    const [oldRecord] = await tx.select()
+      .from(financialRecords)
+      .where(and(eq(financialRecords.id, id), isNull(financialRecords.deletedAt)));
 
-  if (!oldRecord) throw new AppError('Record not found', 404, 'NOT_FOUND');
+    if (!oldRecord) throw new AppError('Record not found', 404, 'NOT_FOUND');
 
-  await db.update(financialRecords)
-    .set({ deletedAt: new Date(), updatedBy: userId })
-    .where(eq(financialRecords.id, id));
+    await tx.update(financialRecords)
+      .set({ deletedAt: new Date(), updatedBy: userId })
+      .where(eq(financialRecords.id, id));
 
-  await db.insert(auditLogs)
-    .values({ recordId: id, changedBy: userId, action: 'DELETE', oldValues: oldRecord, newValues: null })
-    .catch((err) => console.error('Audit log failed:', err));
+    await tx.insert(auditLogs)
+      .values({ recordId: id, changedBy: userId, action: 'DELETE', oldValues: oldRecord, newValues: null });
 
-  return { id };
+    return { id };
+  });
 };
 
 export const hardDeleteRecord = async (id) => {

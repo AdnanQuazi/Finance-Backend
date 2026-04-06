@@ -2,20 +2,8 @@ import { sql, desc, isNull } from 'drizzle-orm';
 import { db } from '../config/db.js';
 import { financialRecords } from '../db/schema.js';
 
-// ─── Shared helpers ───────────────────────────────────────────────────────────
-
-/**
- * Coerce a raw DB value to a plain JS number.
- * Drizzle returns NUMERIC columns as strings; SUM can return null on empty sets
- * even with COALESCE when the driver does not cast the result.
- */
 const toNumber = (value) => Number(value ?? 0);
 
-/**
- * Build a parameterised date-range fragment.
- * Returns a self-contained sql`` chunk that can be AND-ed into any WHERE clause.
- * All values go through Drizzle's parameterisation — no string interpolation.
- */
 const buildDateFilter = (from, to) => {
   if (from && to) return sql`date BETWEEN ${from}::date AND ${to}::date`;
   if (from)       return sql`date >= ${from}::date`;
@@ -23,18 +11,10 @@ const buildDateFilter = (from, to) => {
   return sql`TRUE`;
 };
 
-/**
- * Whitelist the period string to a safe DATE_TRUNC literal.
- * sql.raw() is intentional here — the value never comes from user input
- * directly; it has already been validated by the Zod schema to be exactly
- * 'monthly' or 'weekly'.
- */
 const PERIOD_INTERVAL = {
   weekly:  sql.raw(`'week'`),
   monthly: sql.raw(`'month'`),
 };
-
-// ─── Service functions ────────────────────────────────────────────────────────
 
 export const getSummary = async () => {
   const { rows } = await db.execute(sql`

@@ -11,7 +11,6 @@ const router = Router();
 // Dashboard strictly requires authentication before hitting any route
 router.use(authenticate);
 
-// Viewer level and above
 router.get(
   '/summary', 
   authorize(['viewer', 'analyst', 'manager', 'admin']), 
